@@ -7,6 +7,7 @@ import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
+import org.json.JSONObject;
 
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -25,14 +26,20 @@ public class SentenceSplit extends BaseRichBolt {
 
     @Override
     public void execute(Tuple tuple) {
-        String sentence = tuple.getStringByField("sentence");
-        String [] words = sentence.split(" ");
+        String tweet = tuple.getStringByField("tweet");
+        JSONObject tweetJson = new JSONObject(tweet);
 
-        Matcher m;
-        for (String word : words) {
-            m = wordPattern.matcher(word);
-            if (m.find()) {
-                collector.emit(new Values(m.group()));
+        //if an actual tweet, process it
+        if (tweetJson.has("text")) {
+
+            String [] words = tweetJson.getString("text").split(" ");
+
+            Matcher m;
+            for (String word : words) {
+                m = wordPattern.matcher(word);
+                if (m.find()) {
+                    collector.emit(new Values(m.group()));
+                }
             }
         }
 

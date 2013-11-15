@@ -31,7 +31,7 @@ public class TwitterStreamSpout extends BaseRichSpout {
 
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
-        declarer.declare(new Fields("sentence"));
+        declarer.declare(new Fields("tweet"));
     }
 
     @Override
@@ -65,11 +65,7 @@ public class TwitterStreamSpout extends BaseRichSpout {
     @Override
     public void nextTuple() {
         try {
-            String tweetMsg = msgQueue.take();
-            JSONObject tweet = new JSONObject(tweetMsg);
-            if (tweet.has("text")) {
-                collector.emit(new Values(tweet.getString("text")));
-            }
+            collector.emit(new Values(msgQueue.take()));
         } catch (InterruptedException e) {
             collector.reportError(e);
         }
