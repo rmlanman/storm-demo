@@ -26,6 +26,9 @@ public class WordCountRepository {
         try {
             ZooKeeperInstance zooKeeperInstance = new ZooKeeperInstance(instanceName, zkServers);
             connector = zooKeeperInstance.getConnector(user, password.getBytes());
+            if (!connector.tableOperations().exists(TABLE_NAME)) {
+                connector.tableOperations().create(TABLE_NAME);
+            }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
